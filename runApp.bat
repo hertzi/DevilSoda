@@ -1,0 +1,1 @@
+java -cp build\libs\DevilSoda.jar de.hertzi.Main

@@ -1,0 +1,27 @@
+apply plugin: 'java'
+
+defaultTasks 'clean', 'build', 'test'
+
+repositories {
+    mavenCentral()
+}
+
+ext{
+    junitVersion = '4.12'
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+}
+
+test {
+    afterTest { desc, result ->
+        logger.quiet "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+    }
+}
+
+task runApp(type:JavaExec) {
+    main = 'de.hertzi.Main'
+    standardInput = System.in
+    classpath = sourceSets.main.runtimeClasspath
+}
