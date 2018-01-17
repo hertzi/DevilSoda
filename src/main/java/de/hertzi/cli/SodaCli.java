@@ -58,7 +58,6 @@ public class SodaCli {
 
     private void printAddCoinOptions() {
         printWelcomeScreen(false);
-        System.out.println();
         List<Option> inputOptions = new ArrayList<>();
         for (Coin coin : Coin.values()) {
             inputOptions.add(Option.getOptionForMenuName(coin.getNumValue() + " ECU"));
@@ -69,7 +68,6 @@ public class SodaCli {
 
     private void printPurchaseProductOption() {
         printWelcomeScreen(false);
-        System.out.println();
         List<Option> inputOptions = new ArrayList<>();
         for (String productString : sodaMachine.listProductsForPrice(sodaMachine.getCredit())) {
             inputOptions.add(Option.getOptionForMenuName(productString));
@@ -159,7 +157,7 @@ public class SodaCli {
             if (os.contains("Windows")) {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
             } else {
-                Runtime.getRuntime().exec("clear");
+                new ProcessBuilder("clear").inheritIO().start().waitFor();
             }
         } catch (IOException e) {
             System.err.println("Clear screen command could not be executed");
