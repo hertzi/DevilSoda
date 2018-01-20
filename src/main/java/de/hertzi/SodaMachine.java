@@ -17,7 +17,8 @@ public class SodaMachine implements Controller {
     private List<Coin> coinReturn = new ArrayList<>();
 
     @Override
-    public int addCredit(Coin coin) {
+    public int addCredit(String coinString) {
+        Coin coin = Coin.getCoinForMenuName(coinString);
         return purchaseBuffer.add(coin);
     }
 
@@ -52,9 +53,9 @@ public class SodaMachine implements Controller {
         return stock.listProductsForPrice(price).stream().map(Product::getMenuName).collect(Collectors.toList());
     }
 
-
     @Override
-    public void purchaseProduct(Product product) {
+    public void purchaseProduct(String productString) {
+        Product product = Product.getProductForMenuName(productString);
         stock.releaseProduct(product);
         //fixme has product been rleased? what to do in error case?
         int credit = purchaseBuffer.sum();

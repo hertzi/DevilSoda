@@ -7,9 +7,10 @@ import java.util.Optional;
 
 public interface Stock {
     Optional<Product> releaseProduct(Product product);
-    List<Product> listProducts();
-    List<Product> listProductsForPrice(int price);
 
+    List<Product> listProducts();
+
+    List<Product> listProductsForPrice(int price);
 
     List<String> listInventory();
 }

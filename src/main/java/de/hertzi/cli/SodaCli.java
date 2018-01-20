@@ -1,8 +1,7 @@
 package de.hertzi.cli;
 
-import de.hertzi.enums.Coin;
-import de.hertzi.enums.Product;
 import de.hertzi.SodaMachine;
+import de.hertzi.enums.Coin;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,50 +39,51 @@ public class SodaCli {
         System.out.println("Coin Return: " + Arrays.toString(sodaMachine.listCoinReturn().toArray()));
         System.out.println();
         if (hasOptions && isMainMenu) {
-            List<Option> inputOptions = new ArrayList<>();
-            inputOptions.add(Option.ADD_CREDIT);
+            List<Action> intputActions = new ArrayList<>();
+            intputActions.add(new Action(Option.ADD_CREDIT));
             if (sodaMachine.getCredit() > 0) {
-                inputOptions.add(Option.RETURN_CREDIT);
+                intputActions.add(new Action(Option.RETURN_CREDIT));
             }
             if (!sodaMachine.listCoinReturn().isEmpty()) {
-                inputOptions.add(Option.EMPTY_COIN_RETURN);
+                intputActions.add(new Action(Option.EMPTY_COIN_RETURN));
             }
             if (!sodaMachine.listProductsForPrice(sodaMachine.getCredit()).isEmpty()) {
-                inputOptions.add(Option.PURCHASE_PRODUCT);
+                intputActions.add(new Action(Option.PURCHASE_PRODUCT));
             }
-            userInput(inputOptions);
+            userInput(intputActions);
 
         }
     }
 
-    private void printAddCoinOptions() {
+    private void printAddCoinActions() {
         printWelcomeScreen(false);
         System.out.println();
-        List<Option> inputOptions = new ArrayList<>();
+        List<Action> inputActions = new ArrayList<>();
         for (Coin coin : Coin.values()) {
-            inputOptions.add(Option.getOptionForMenuName(coin.getNumValue() + " ECU"));
+            inputActions.add(new Action(Option.ADD_COIN, coin.getMenuName() + " ECU", coin.getMenuName()));
         }
-        inputOptions.add(Option.MAIN_MENU);
-        userInput(inputOptions);
+        inputActions.add(new Action(Option.MAIN_MENU));
+        userInput(inputActions);
     }
 
-    private void printPurchaseProductOption() {
+    private void printPurchaseProductActions() {
         printWelcomeScreen(false);
         System.out.println();
-        List<Option> inputOptions = new ArrayList<>();
+        List<Action> inputActions = new ArrayList<>();
         for (String productString : sodaMachine.listProductsForPrice(sodaMachine.getCredit())) {
-            inputOptions.add(Option.getOptionForMenuName(productString));
+            inputActions.add(new Action(Option.PURCHASE_ITEM, productString, productString));
         }
-        inputOptions.add(Option.MAIN_MENU);
-        userInput(inputOptions);
+        inputActions.add(new Action(Option.MAIN_MENU));
+        userInput(inputActions);
     }
 
-    private void userInput(List<Option> options) {
+
+    private void userInput(List<Action> actions) {
         System.out.println("Your Options:");
         System.out.println("-------------");
         System.out.println();
-        for (int i = 0; i < options.size(); i++) {
-            System.out.println("" + (i + 1) + ". " + options.get(i).getMenuName());
+        for (int i = 0; i < actions.size(); i++) {
+            System.out.println("" + (i + 1) + ". " + actions.get(i).getMenuName());
         }
 
         int choice = 0;
@@ -92,7 +92,7 @@ public class SodaCli {
             try {
                 Scanner scanner = new Scanner(System.in);
                 choice = scanner.nextInt();
-                if (choice > 0 && choice <= options.size()) {
+                if (choice > 0 && choice <= actions.size()) {
                     isWrongInput = false;
                 }
             } catch (InputMismatchException ime) {
@@ -100,43 +100,28 @@ public class SodaCli {
                 //TODO add log here
             }
             if (isWrongInput) {
-                System.out.println("Please make your choice from one of the options 1 - " + options.size());
+                System.out.println("Please make your choice from one of the options 1 - " + actions.size());
             }
         }
-        executeOption(options.get(choice - 1));
+        executeAction(actions.get(choice - 1));
     }
 
-    private void executeOption(final Option option) {
-        switch (option) {
+    private void executeAction(final Action action) {
+        switch (action.getOption()) {
             case EMPTY_COIN_RETURN:
                 sodaMachine.emptyCoinReturn();
                 break;
             case RETURN_CREDIT:
                 sodaMachine.emptyCredit();
                 break;
-            case ADD_COIN_ONE:
-                sodaMachine.addCredit(Coin.ONE);
+            case ADD_COIN:
+                sodaMachine.addCredit((String) action.getArg());
                 break;
-            case ADD_COIN_TWO:
-                sodaMachine.addCredit(Coin.TWO);
-                break;
-            case ADD_COIN_FIVE:
-                sodaMachine.addCredit(Coin.FIVE);
-                break;
-            case ADD_COIN_TEN:
-                sodaMachine.addCredit(Coin.TEN);
-                break;
-            case PURCHASE_WATER:
-                sodaMachine.purchaseProduct(Product.WATER);
-                break;
-            case PURCHASE_JUICE:
-                sodaMachine.purchaseProduct(Product.JUICE);
-                break;
-            case PURCHASE_ALCOHOL:
-                sodaMachine.purchaseProduct(Product.ALOHOL);
+            case PURCHASE_ITEM:
+                sodaMachine.purchaseProduct((String) action.getArg());
                 break;
         }
-        handleNavigation(option.getNextMenu());
+        handleNavigation(action.getNextMenu());
     }
 
     private void handleNavigation(Menu menu) {
@@ -145,10 +130,10 @@ public class SodaCli {
                 printWelcomeScreen(true);
                 break;
             case ADD_CREDIT:
-                printAddCoinOptions();
+                printAddCoinActions();
                 break;
             case PURCHASE_PRODUCT:
-                printPurchaseProductOption();
+                printPurchaseProductActions();
                 break;
         }
     }
